@@ -7,11 +7,16 @@ import {
   RestExplorerComponent,
 } from '@loopback/rest-explorer';
 import {ServiceMixin} from '@loopback/service-proxy';
+import * as dotenv from 'dotenv';
+import * as dotenvExt from 'dotenv-extended';
+import {AuthenticationComponent, Strategies} from 'loopback4-authentication';
 import {
   AuthorizationBindings,
   AuthorizationComponent,
 } from 'loopback4-authorization';
 import path from 'path';
+import {GoogleOauth2VerifyProvider} from './modules/auth/providers/google-oauth2-verify.provider';
+
 import {MySequence} from './sequence';
 
 export {ApplicationConfig};
@@ -20,6 +25,11 @@ export class AuthLb4Application extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
 ) {
   constructor(options: ApplicationConfig = {}) {
+    dotenv.config();
+    dotenvExt.load({
+      schema: '.env.example',
+      errorOnMissing: false,
+    });
     super(options);
 
     // Set up the custom sequence
@@ -33,10 +43,16 @@ export class AuthLb4Application extends BootMixin(
       path: '/explorer',
     });
     this.component(RestExplorerComponent);
+    this.component(AuthenticationComponent);
+    this.bind(Strategies.Passport.GOOGLE_OAUTH2_VERIFIER).toProvider(
+      GoogleOauth2VerifyProvider,
+    );
+
     this.bind(AuthorizationBindings.CONFIG).to({
       allowAlwaysPaths: ['/explorer'],
     });
     this.component(AuthorizationComponent);
+
     this.projectRoot = __dirname;
     // Customize @loopback/boot Booter Conventions here
     this.bootOptions = {

@@ -1,16 +1,14 @@
 import {inject} from '@loopback/core';
-import {DefaultCrudRepository} from '@loopback/repository';
-import {DbDataSource} from '../datasources';
-import {Role, RoleRelations} from '../models';
 
-export class RoleRepository extends DefaultCrudRepository<
+import {DbDataSource} from '../datasources';
+import {Role} from '../models';
+import {DefaultSoftCrudRepository} from './default-soft-crud.repository.base';
+
+export class RoleRepository extends DefaultSoftCrudRepository<
   Role,
-  typeof Role.prototype.key,
-  RoleRelations
+  typeof Role.prototype.id
 > {
-  constructor(
-    @inject('datasources.db') dataSource: DbDataSource,
-  ) {
+  constructor(@inject('datasources.pgdb') dataSource: DbDataSource) {
     super(Role, dataSource);
   }
 }

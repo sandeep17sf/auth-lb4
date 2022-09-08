@@ -1,35 +1,74 @@
-import {Entity, model, property} from '@loopback/repository';
+import {hasOne, model, property} from '@loopback/repository';
+import {IAuthUser} from 'loopback4-authentication';
 
-@model({settings: {strict: false}})
-export class User extends Entity {
+import {
+  UserCredentials,
+  UserCredentialsWithRelations,
+} from './user-credentials.model';
+import {UserModifiableEntity} from './user-modifiable-entity.model';
+
+@model({
+  name: 'users',
+})
+export class User extends UserModifiableEntity implements IAuthUser {
   @property({
     type: 'number',
     id: true,
-    generated: true,
   })
   id?: number;
 
   @property({
     type: 'string',
     required: true,
+    name: 'first_name',
   })
-  name: string;
+  firstName: string;
+
+  @property({
+    type: 'string',
+    name: 'last_name',
+  })
+  lastName: string;
+
+  @property({
+    type: 'string',
+    name: 'middle_name',
+  })
+  middleName?: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  username: string;
 
   @property({
     type: 'string',
   })
-  address?: string;
+  email?: string;
 
   @property({
     type: 'string',
   })
   phone?: string;
 
-  // Define well-known properties here
+  @property({
+    type: 'number',
+    name: 'default_tenant',
+  })
+  defaultTenant: number;
 
-  // Indexer property to allow additional data
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [prop: string]: any;
+  @property({
+    type: 'date',
+    name: 'last_login',
+    postgresql: {
+      column: 'last_login',
+    },
+  })
+  lastLogin?: string;
+
+  @hasOne(() => UserCredentials, {keyTo: 'userId'})
+  credentials: UserCredentials;
 
   constructor(data?: Partial<User>) {
     super(data);
@@ -37,7 +76,7 @@ export class User extends Entity {
 }
 
 export interface UserRelations {
-  // describe navigational properties here
+  credentials: UserCredentialsWithRelations;
 }
 
 export type UserWithRelations = User & UserRelations;
