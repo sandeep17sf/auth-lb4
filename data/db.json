@@ -1,0 +1,10 @@
+{
+  "ids": {
+    "Todo": 2
+  },
+  "models": {
+    "Todo": {
+      "1": "{\"deleted\":true,\"name\":\"wake up\",\"id\":1,\"deletedOn\":\"2022-09-08T02:20:40.037Z\"}"
+    }
+  }
+}
